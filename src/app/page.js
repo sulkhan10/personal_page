@@ -403,7 +403,7 @@ export default function Home() {
           {/* Profile Section */}
           <div className="flex flex-col items-center space-x-4">
             <img
-              src="https://media.licdn.com/dms/image/v2/D5603AQE2PGTUJ9f-KQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1693303072350?e=2147483647&v=beta&t=pCIqr-ImDrl203hpZzoasyvS5JsaH9ayd9StkH0yxr4"
+              src="pp.png"
               alt="Profile Picture"
               className="w-36 h-36 rounded-full object-cover border-2 border-[var(--retro-border)] shadow-[0_0_0_4px_#05070c]"
             />
