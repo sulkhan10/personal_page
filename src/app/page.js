@@ -7,7 +7,8 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaTimes,
-  FaStore,
+  FaApple,
+  FaGooglePlay,
   FaGithub,
   FaGlobe,
   FaCircle,
@@ -43,6 +44,8 @@ import {
 export default function Home() {
   const [activeProject, setActiveProject] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isModalImageLoading, setIsModalImageLoading] = useState(false);
+  const [modalImageError, setModalImageError] = useState(false);
 
   const defaultProjectImages = [
     "/retro-card.svg",
@@ -55,8 +58,14 @@ export default function Home() {
   const projectLinkConfig = [
     { key: "github", label: "GitHub", icon: FaGithub },
     { key: "showcase", label: "Showcase", icon: FaGlobe },
-    { key: "ios", label: "iOS App Store", icon: FaStore },
-    { key: "playstore", label: "Play Store", icon: FaStore },
+    { key: "ios", label: "iOS App Store", icon: FaApple },
+    { key: "playstore", label: "Play Store", icon: FaGooglePlay },
+  ];
+  const projectBadgeConfig = [
+    { key: "github", label: "Repo", icon: FaGithub },
+    { key: "showcase", label: "Web", icon: FaGlobe },
+    { key: "ios", label: "iOS", icon: FaApple },
+    { key: "playstore", label: "Android", icon: FaGooglePlay },
   ];
 
   const getProjectImages = (project) => {
@@ -78,12 +87,68 @@ export default function Home() {
     return defaultProjectImages;
   };
 
+  const getProjectThumbnail = (project) => {
+    const images = getProjectImages(project);
+    return images[0] || defaultProjectImage;
+  };
+
+  const ProjectThumbnail = ({ src, alt }) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [hasError, setHasError] = useState(false);
+    const resolvedSrc = hasError ? defaultProjectImage : src || defaultProjectImage;
+
+    useEffect(() => {
+      setIsLoading(true);
+      setHasError(false);
+    }, [src]);
+
+    return (
+      <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-md border-2 border-[var(--retro-border)] bg-[var(--retro-panel)] sm:w-36">
+        {isLoading && (
+          <div className="absolute inset-0 animate-pulse bg-[var(--retro-panel)] opacity-70" />
+        )}
+        <img
+          src={resolvedSrc}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setIsLoading(false)}
+          onError={() => {
+            setHasError(true);
+            setIsLoading(false);
+          }}
+          className={`h-full w-full object-cover transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
+        />
+      </div>
+    );
+  };
+
   const projectImages = getProjectImages(activeProject);
   const totalImages = projectImages.length;
   const hasMultipleImages = totalImages > 1;
   const currentImage =
     projectImages[activeImageIndex % Math.max(totalImages, 1)] ||
     defaultProjectImage;
+  const modalImageSrc = modalImageError ? defaultProjectImage : currentImage;
+
+  const openProject = (project) => {
+    setIsModalImageLoading(true);
+    setModalImageError(false);
+    setActiveProject(project);
+    setActiveImageIndex(0);
+  };
+
+  const closeProject = () => {
+    setActiveProject(null);
+    setIsModalImageLoading(false);
+    setModalImageError(false);
+  };
+
+  const setImageIndexWithLoading = (nextIndex) => {
+    setIsModalImageLoading(true);
+    setModalImageError(false);
+    setActiveImageIndex(nextIndex);
+  };
 
   useEffect(() => {
     if (!activeProject) {
@@ -99,15 +164,15 @@ export default function Home() {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        setActiveProject(null);
+        closeProject();
       }
       if (event.key === "ArrowRight" && totalImages > 1) {
         event.preventDefault();
-        setActiveImageIndex((prev) => (prev + 1) % totalImages);
+        setImageIndexWithLoading((prev) => (prev + 1) % totalImages);
       }
       if (event.key === "ArrowLeft" && totalImages > 1) {
         event.preventDefault();
-        setActiveImageIndex((prev) => (prev - 1 + totalImages) % totalImages);
+        setImageIndexWithLoading((prev) => (prev - 1 + totalImages) % totalImages);
       }
     };
 
@@ -512,6 +577,93 @@ export default function Home() {
             </p>
           </div>
         </div>
+
+  <div
+          className="py-16 px-6 w-full mx-auto retro-appear"
+          style={{ animationDelay: "0.4s" }}
+        >
+          <div className="max-w-7xl mx-auto px-0">
+            {/* Heading */}
+            <h2 className="retro-title text-2xl text-center text-[var(--retro-accent)]">
+              Let&apos;s work together
+            </h2>
+            <p className="mt-4 text-xl text-[var(--retro-muted)] text-center">
+              my portofolio and project
+            </p>
+            {dataPorto.length > 0 &&
+              dataPorto.map((item, index) => {
+                const badgeItems = projectBadgeConfig.filter(
+                  (badge) => item.links?.[badge.key]
+                );
+                const thumbnailSrc = getProjectThumbnail(item);
+                return (
+                  <div
+                    key={index}
+                    className="mt-12 grid grid-cols-1 md:grid-cols-1 gap-8"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => openProject(item)}
+                      className="retro-panel w-full text-left p-6 transition-transform duration-200 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--retro-accent)]"
+                      aria-haspopup="dialog"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                        <ProjectThumbnail
+                          src={thumbnailSrc}
+                          alt={`${item.title} thumbnail`}
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-4">
+                            <h3 className="text-xl font-semibold text-[var(--retro-foreground)]">
+                              {item.title}
+                            </h3>
+                            {item.period && (
+                              <span className="text-base text-[var(--retro-accent)]">
+                                {item.period}
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-3 text-lg text-[var(--retro-muted)]">
+                            {item.desc}
+                          </p>
+                          {item.note && (
+                            <p className="mt-2 text-base text-[var(--retro-accent-2)]">
+                              {item.note}
+                            </p>
+                          )}
+                          {badgeItems.length > 0 && (
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                              {badgeItems.map((badge) => {
+                                const Icon = badge.icon;
+                                return (
+                                  <span
+                                    key={`${item.title}-${badge.key}`}
+                                    className="flex items-center gap-1 rounded border border-[var(--retro-border)] px-2 py-1 text-xs uppercase tracking-wide text-[var(--retro-accent)]"
+                                  >
+                                    <Icon className="text-sm" />
+                                    {badge.label}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <span className="text-base font-semibold text-[var(--retro-foreground)]">
+                              {item.techStack}
+                            </span>
+                            <span className="text-base text-[var(--retro-muted)]">
+                              Press to view details
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+
         <div
           className="w-full px-6 pb-16 retro-appear"
           style={{ animationDelay: "0.2s" }}
@@ -728,64 +880,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div
-          className="py-16 px-6 w-full mx-auto retro-appear"
-          style={{ animationDelay: "0.4s" }}
-        >
-          <div className="max-w-7xl mx-auto px-0">
-            {/* Heading */}
-            <h2 className="retro-title text-2xl text-center text-[var(--retro-accent)]">
-              Let&apos;s work together
-            </h2>
-            <p className="mt-4 text-xl text-[var(--retro-muted)] text-center">
-              my portofolio and project
-            </p>
-            {dataPorto.length > 0 &&
-              dataPorto.map((item, index) => (
-                <div
-                  key={index}
-                  className="mt-12 grid grid-cols-1 md:grid-cols-1 gap-8"
-                >
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveProject(item);
-                      setActiveImageIndex(0);
-                    }}
-                    className="retro-panel w-full text-left p-6 transition-transform duration-200 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--retro-accent)]"
-                    aria-haspopup="dialog"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="text-xl font-semibold text-[var(--retro-foreground)]">
-                        {item.title}
-                      </h3>
-                      {item.period && (
-                        <span className="text-base text-[var(--retro-accent)]">
-                          {item.period}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-3 text-lg text-[var(--retro-muted)]">
-                      {item.desc}
-                    </p>
-                    {item.note && (
-                      <p className="mt-2 text-base text-[var(--retro-accent-2)]">
-                        {item.note}
-                      </p>
-                    )}
-                    <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <span className="text-base font-semibold text-[var(--retro-foreground)]">
-                        {item.techStack}
-                      </span>
-                      <span className="text-base text-[var(--retro-muted)]">
-                        Press to view details
-                      </span>
-                    </div>
-                  </button>
-                </div>
-              ))}
-          </div>
-        </div>
+      
         {activeProject && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center px-4 py-10"
@@ -795,7 +890,7 @@ export default function Home() {
           >
             <div
               className="absolute inset-0 bg-black/80"
-              onClick={() => setActiveProject(null)}
+              onClick={closeProject}
             />
             <div
               className="relative z-10 w-full max-w-2xl retro-panel retro-scanlines p-6"
@@ -814,7 +909,7 @@ export default function Home() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveProject(null)}
+                  onClick={closeProject}
                   className="retro-button px-3 py-2 text-base"
                   aria-label="Close modal"
                 >
@@ -824,16 +919,34 @@ export default function Home() {
               <div className="mt-4">
                 <div className="relative">
                   <img
-                    src={currentImage}
+                    src={modalImageSrc}
                     alt={`${activeProject.title} preview ${activeImageIndex + 1}`}
-                    className="w-full rounded-md border-2 border-[var(--retro-border)]"
+                    loading="eager"
+                    onLoad={() => setIsModalImageLoading(false)}
+                    onError={() => {
+                      setModalImageError(true);
+                      setIsModalImageLoading(false);
+                    }}
+                    className={`w-full rounded-md border-2 border-[var(--retro-border)] transition-opacity duration-300 ${isModalImageLoading ? "opacity-0" : "opacity-100"}`}
                   />
+                  {isModalImageLoading && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-md border-2 border-[var(--retro-border)] bg-[var(--retro-panel)] opacity-70">
+                      <span className="text-sm text-[var(--retro-muted)]">
+                        Loading image...
+                      </span>
+                    </div>
+                  )}
+                  {modalImageError && currentImage !== defaultProjectImage && (
+                    <div className="pointer-events-none absolute bottom-3 right-3 rounded border border-[var(--retro-border)] bg-[var(--retro-panel)] px-2 py-1 text-xs text-[var(--retro-muted)]">
+                      Image unavailable
+                    </div>
+                  )}
                   {hasMultipleImages && (
                     <>
                       <button
                         type="button"
                         onClick={() =>
-                          setActiveImageIndex(
+                          setImageIndexWithLoading(
                             (prev) => (prev - 1 + totalImages) % totalImages
                           )
                         }
@@ -845,7 +958,7 @@ export default function Home() {
                       <button
                         type="button"
                         onClick={() =>
-                          setActiveImageIndex(
+                          setImageIndexWithLoading(
                             (prev) => (prev + 1) % totalImages
                           )
                         }
@@ -863,7 +976,11 @@ export default function Home() {
                       <button
                         key={`${activeProject.title}-dot-${index}`}
                         type="button"
-                        onClick={() => setActiveImageIndex(index)}
+                        onClick={() => {
+                          if (index !== activeImageIndex) {
+                            setImageIndexWithLoading(index);
+                          }
+                        }}
                         className={`h-2.5 w-2.5 rounded-full border border-[var(--retro-accent)] ${index === activeImageIndex
                             ? "bg-[var(--retro-accent)]"
                             : "bg-transparent"

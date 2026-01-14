@@ -25,6 +25,10 @@ body {
   font-family: var(--font-console), "VT323", monospace;
   font-size: 18px;
   letter-spacing: 0.02em;
+  position: relative;
+  min-height: 100%;
+  overflow-x: hidden;
+  isolation: isolate;
   background-image:
     radial-gradient(circle at 10% 10%, rgba(71, 245, 255, 0.12), transparent 35%),
     radial-gradient(circle at 85% 20%, rgba(255, 79, 216, 0.15), transparent 40%),
@@ -37,6 +41,49 @@ body {
       transparent 1px,
       transparent 120px
     );
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: -30%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::before {
+  background-image:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(71, 245, 255, 0.12) 2px, transparent 2px),
+    linear-gradient(0deg, rgba(255, 79, 216, 0.1) 2px, transparent 2px);
+  background-size: 12px 12px, 12px 12px, 48px 48px, 64px 64px;
+  opacity: 0.4;
+  mix-blend-mode: screen;
+  animation: pixel-scroll 120s linear infinite;
+}
+
+body::after {
+  inset: -40%;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(109, 255, 134, 0.22) 0 2px,
+      transparent 2px 18px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(109, 255, 134, 0.18) 0 2px,
+      transparent 2px 18px
+    ),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 72px 72px, 72px 72px, 120px 120px, 120px 120px;
+  opacity: 0.25;
+  mix-blend-mode: screen;
+  animation: pixel-scroll 180s linear infinite reverse,
+    pixel-flicker 6s steps(4) infinite;
 }
 
 .retro-title {
@@ -121,11 +168,34 @@ body {
   }
 }
 
+@keyframes pixel-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-12%, -18%, 0);
+  }
+}
+
+@keyframes pixel-flicker {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .retro-appear {
     animation: none;
   }
   .retro-button {
     transition: none;
+  }
+  body::before,
+  body::after {
+    animation: none;
   }
 }
