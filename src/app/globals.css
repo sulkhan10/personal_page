@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --retro-bg: #070b14;
+  --retro-foreground: #e8ff8a;
+  --retro-accent: #47f5ff;
+  --retro-accent-2: #ff4fd8;
+  --retro-border: #6dff86;
+  --retro-panel: #101a2f;
+  --retro-muted: #9fb3c8;
+  --background: var(--retro-bg);
+  --foreground: var(--retro-foreground);
 }
 
 html {
@@ -20,7 +20,112 @@ html {
 
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--retro-foreground);
+  background-color: var(--retro-bg);
+  font-family: var(--font-console), "VT323", monospace;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(71, 245, 255, 0.12), transparent 35%),
+    radial-gradient(circle at 85% 20%, rgba(255, 79, 216, 0.15), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(109, 255, 134, 0.12), transparent 45%),
+    linear-gradient(180deg, #070b14 0%, #0c1424 55%, #070b14 100%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 0,
+      rgba(255, 255, 255, 0.04) 1px,
+      transparent 1px,
+      transparent 120px
+    );
+}
+
+.retro-title {
+  font-family: var(--font-retro), "Press Start 2P", monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(71, 245, 255, 0.4);
+}
+
+.retro-glow {
+  text-shadow: 0 0 8px rgba(71, 245, 255, 0.7),
+    0 0 18px rgba(255, 79, 216, 0.45);
+}
+
+.retro-frame {
+  border: 2px solid var(--retro-border);
+  box-shadow: 0 0 0 2px #05070c, 0 0 16px rgba(71, 245, 255, 0.2);
+}
+
+.retro-panel {
+  background: var(--retro-panel);
+  border: 2px solid var(--retro-border);
+  box-shadow: 0 0 0 2px #05070c, 8px 8px 0 #05070c;
+}
+
+.retro-chip {
+  border: 1px solid rgba(109, 255, 134, 0.7);
+  background: rgba(8, 12, 22, 0.85);
+  box-shadow: 4px 4px 0 #05070c;
+  padding: 0.75rem;
+}
+
+.retro-button {
+  border: 2px solid var(--retro-accent);
+  color: var(--retro-accent);
+  background: rgba(8, 12, 22, 0.85);
+  box-shadow: 0 0 0 2px #05070c;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease,
+    background 0.2s ease;
+}
+
+.retro-button:hover {
+  color: #05070c;
+  background: var(--retro-accent);
+  transform: translate(-2px, -2px);
+  box-shadow: 0 0 0 2px #05070c, 6px 6px 0 #05070c;
+}
+
+.retro-scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.retro-scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.03) 0,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  opacity: 0.28;
+  mix-blend-mode: screen;
+}
+
+.retro-appear {
+  animation: retro-in 0.7s ease-out both;
+}
+
+@keyframes retro-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retro-appear {
+    animation: none;
+  }
+  .retro-button {
+    transition: none;
+  }
 }

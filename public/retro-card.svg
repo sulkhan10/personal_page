@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#070b14" />
+      <stop offset="100%" stop-color="#0f1a2d" />
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#47f5ff" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#ff4fd8" stop-opacity="0.8" />
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg)" />
+  <g opacity="0.5" stroke="#1b2c45" stroke-width="1">
+    <path d="M0 60H900M0 120H900M0 180H900M0 240H900M0 300H900M0 360H900M0 420H900M0 480H900" />
+    <path d="M60 0V540M120 0V540M180 0V540M240 0V540M300 0V540M360 0V540M420 0V540M480 0V540M540 0V540M600 0V540M660 0V540M720 0V540M780 0V540M840 0V540" />
+  </g>
+  <rect x="40" y="40" width="820" height="460" fill="none" stroke="#6dff86" stroke-width="4" />
+  <rect x="70" y="70" width="760" height="400" fill="none" stroke="url(#glow)" stroke-width="2" />
+  <g fill="#e8ff8a" font-family="monospace" font-size="28" letter-spacing="4">
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">PROJECT PREVIEW</text>
+  </g>
+</svg>
